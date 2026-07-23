@@ -1,0 +1,31 @@
+# ============================================================
+# Docker Compose - Production Configuration
+# ============================================================
+
+services:
+  api:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      target: production
+    container_name: python-notes-api
+    ports:
+      - "5000:5000"
+    environment:
+      - FLASK_ENV=production
+      - SECRET_KEY=${SECRET_KEY:-production-secret-key}
+      - JWT_SECRET_KEY=${JWT_SECRET_KEY:-production-jwt-secret}
+      - DATABASE_URL=sqlite:///data/notes.db
+    volumes:
+      - api_data:/app/data
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:5000/api/v1/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 10s
+
+volumes:
+  api_data:
+    driver: local

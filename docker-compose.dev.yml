@@ -1,0 +1,27 @@
+# ============================================================
+# Docker Compose - Development Configuration
+# ============================================================
+
+services:
+  api:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      target: production
+    container_name: python-notes-api-dev
+    ports:
+      - "5000:5000"
+    environment:
+      - FLASK_ENV=development
+      - SECRET_KEY=dev-secret-key
+      - JWT_SECRET_KEY=dev-jwt-secret
+      - DATABASE_URL=sqlite:///data/notes_dev.db
+    volumes:
+      - ./app:/app/app
+      - api_dev_data:/app/data
+    restart: "no"
+    command: ["flask", "--app", "app.main", "run", "--host", "0.0.0.0", "--port", "5000", "--debug"]
+
+volumes:
+  api_dev_data:
+    driver: local
